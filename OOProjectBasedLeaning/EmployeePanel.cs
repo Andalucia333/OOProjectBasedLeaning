@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 namespace OOProjectBasedLeaning
 {
 
-    public class EmployeePanel : Panel
+    public class EmployeePanel : DragDropPanel
     {
+
+      
 
         private Employee employee;
 
@@ -20,6 +22,22 @@ namespace OOProjectBasedLeaning
             InitializeComponent();
 
         }
+
+        protected override void OnPanelMouseDown()
+        {
+            DoDragDropMove();
+
+            if(GetFrom() is not EmployeeCreatorForm)
+            {
+
+                
+            }
+            else
+            {
+
+            }
+        }
+
 
         private void InitializeComponent()
         {
