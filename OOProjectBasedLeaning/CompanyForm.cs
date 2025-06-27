@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace OOProjectBasedLeaning
 {
 
-    public partial class CompanyForm : Form
+    public partial class CompanyForm : DragDropForm
     {
 
         private Company company = NullCompany.Instance;
