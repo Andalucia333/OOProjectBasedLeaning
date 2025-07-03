@@ -37,6 +37,7 @@ namespace OOProjectBasedLeaning
         private int id;
 
         private Company company = NullCompany.Instance;
+        private Place place = NullPlace.Instance;
 
         public EmployeeModel() : this(Employee.NEW)
         {
@@ -134,7 +135,7 @@ namespace OOProjectBasedLeaning
 
         public bool IsAtHome()
         {
-            return true;
+            return place is ;
         }
 
     }
