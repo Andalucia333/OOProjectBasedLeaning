@@ -27,6 +27,8 @@ namespace OOProjectBasedLeaning
 
         bool IsAtWork();
 
+        bool IsAtHome();
+
     }
 
     public class EmployeeModel : ModelEntity, Employee
@@ -130,6 +132,11 @@ namespace OOProjectBasedLeaning
 
         }
 
+        public bool IsAtHome()
+        {
+            return true;
+        }
+
     }
 
     public class Manager : EmployeeModel
@@ -220,6 +227,10 @@ namespace OOProjectBasedLeaning
 
         }
 
+        public bool IsAtHome()
+        {
+            return false;
+        }
     }
 
 }
