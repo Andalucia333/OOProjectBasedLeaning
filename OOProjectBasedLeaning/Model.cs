@@ -130,7 +130,7 @@ namespace OOProjectBasedLeaning
 
     }
 
-    public class NullNotifierModel : NotifierModelEntity, NullObject
+    public class NullNotifierModel : NotifierModelEntity, NullO  bject
     {
 
         private static readonly NotifierModel instance = new NullNotifierModel();
