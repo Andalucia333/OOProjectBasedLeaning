@@ -1,81 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
-namespace OOProjectBasedLeaning
-{
-    public class EmployeePanel : DragDropPanel
-    {
-        private Employee employee;
-        private TimeTracker timeTracker;
-        private Label statusLabel;
-        private TextBox nameTextBox;
-
-        public Employee Employee => employee;
-
-        public EmployeePanel(Employee employee, TimeTracker timeTracker)
-        {
-            this.employee = employee;
-            this.timeTracker = timeTracker;
-
-            InitializeComponent();
-        }
-
-        protected override void OnPanelMouseDown()
-        {
-            // DragDropPanelのDoDragDropMoveを呼び出してドラッグ開始
-            DoDragDropMove();
-        }
-
-        private void InitializeComponent()
-        {
-            this.BorderStyle = BorderStyle.FixedSingle;
-            this.BackColor = Color.LightYellow;
-            this.Size = new Size(300, 40);
-
-            Label nameLabel = new Label
-            {
-                Text = "名前:",
-                Location = new Point(10, 10),
-                AutoSize = true
-            };
-
-            nameTextBox = new TextBox
-            {
-                Text = employee.Name,
-                Location = new Point(60, 6),
-                Width = 120
-            };
-            nameTextBox.TextChanged += (s, e) => { employee.Name = nameTextBox.Text; };
-
-            statusLabel = new Label
-            {
-                Text = GetStatusText(),
-                Location = new Point(190, 10),
-                AutoSize = true,
-                ForeColor = Color.DarkBlue
-            };
-
-            Controls.Add(nameLabel);
-            Controls.Add(nameTextBox);
-            Controls.Add(statusLabel);
-        }
-
-        public void UpdateStatus()
-        {
-            statusLabel.Text = GetStatusText();
-        }
-
-        private string GetStatusText()
-        {
-            return timeTracker.IsAtWork(employee.Id) ? "勤務中" : "退勤中";
-        }
-    }
-}
-
-
-/*
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -87,7 +10,7 @@ namespace OOProjectBasedLeaning
     public class EmployeePanel : DragDropPanel
     {
 
-      
+
 
         private Employee employee;
 
@@ -104,10 +27,10 @@ namespace OOProjectBasedLeaning
         {
             DoDragDropMove();
 
-            if(GetFrom() is not EmployeeCreatorForm)
+            if (GetFrom() is not EmployeeCreatorForm)
             {
 
-                
+
             }
             else
             {
@@ -152,7 +75,7 @@ namespace OOProjectBasedLeaning
         public void InitializeComponent()
         {
             this.AutoSize = true;
-            this.Font = new Font("Arial",10,FontStyle.Regular);
+            this.Font = new Font("Arial", 10, FontStyle.Regular);
 
             Update(this);
         }
@@ -164,9 +87,47 @@ namespace OOProjectBasedLeaning
                 Text = "勤務中";
                 ForeColor = Color.Red;
             }
-            //else if(employee.)
+            else if (employee.IsAtHome())
+            {
+                Text = "帰宅中";
+                ForeColor = Color.Green;
+            }
+            else
+            {
+                Text = "―――";
+                ForeColor = Color.Gray;
+            }
         }
     }
 
+    public class EmployeeNameLabel : Label, Observer
+    {
+        private Employee employee = NullEmployee.Instance;
+
+        public EmployeeNameLabel(Employee employee)
+        {
+            if(employee is NotifierModelEntity)
+            {
+                (employee as NotifierModelEntity).AddObserver(this);
+            }
+
+            this.employee = employee;
+            InitializeComponent();
+            
+        }
+
+        private void InitializeComponent()
+        {
+            this.AutoSize = true;
+            Update(this);
+        }
+
+        public void Update(object sender)
+        {
+            Text = employee.Name;
+        }
+    }
+
+
+
 }
-*/
