@@ -19,6 +19,9 @@ namespace OOProjectBasedLeaning
 
         Employee RemoveCompany();
 
+        Employee AddHome(Home home);
+        Employee RemoveHome();
+
         Company In();
 
         void ClockIn();
@@ -108,6 +111,19 @@ namespace OOProjectBasedLeaning
 
             return this;
 
+        }
+
+        public Employee AddHome(Home home)
+        {
+            this.home = home.AddEmployee(this);
+            return this;
+        }
+
+        public Employee RemoveHome()
+        {
+            home.RemoveEmployee(this);
+            home = NullHome.Instance;
+            return this;
         }
 
         public Company In()
@@ -222,6 +238,16 @@ namespace OOProjectBasedLeaning
 
             return this;
 
+        }
+
+        public Employee AddHome(Home home)
+        {
+            return this;
+        }
+
+        public Employee RemoveHome()
+        {
+            return this;
         }
 
         public Company In()
