@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,6 +83,11 @@ namespace OOProjectBasedLeaning
 
             return this;
 
+        }
+
+        protected Form GetFrom()
+        {
+            return form;
         }
 
         protected DragDropPanel MoveTo(Point point)

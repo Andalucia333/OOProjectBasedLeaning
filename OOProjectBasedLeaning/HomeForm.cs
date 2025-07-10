@@ -1,7 +1,7 @@
 namespace OOProjectBasedLeaning
 {
 
-    public partial class HomeForm : Form
+    public partial class HomeForm : DragDropForm
     {
 
         public HomeForm()

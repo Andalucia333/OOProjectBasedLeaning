@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace OOProjectBasedLeaning
 {
 
-    public partial class EmployeeCreatorForm : Form
+    public partial class EmployeeCreatorForm : DragDropForm
     {
 
         private int employeeId = 10000;
