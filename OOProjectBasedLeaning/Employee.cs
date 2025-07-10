@@ -150,13 +150,14 @@ namespace OOProjectBasedLeaning
         public void GoToCompany()
         {
             place = company;
+            company.ClockIn(this);
             Notify();
-            
         }
 
         public void GoToHome()
         {
             place = home;
+            company.ClockOut(this);
             Notify();
         }
 

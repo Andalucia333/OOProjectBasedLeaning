@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,11 +48,11 @@ namespace OOProjectBasedLeaning
         /// <summary>
         /// <DateTime.Today, <Employee.Id, DateTime.Now>>
         /// </summary>
-        private Dictionary<DateTime, Dictionary<int, DateTime>> timestamp4PunchIn = new Dictionary<DateTime, Dictionary<int, DateTime>>();
+        private Dictionary<DateTime, List<Dictionary<int, DateTime>>> timestamp4PunchIn = new Dictionary<DateTime, List<Dictionary<int, DateTime>>>();
         /// <summary>
         /// <DateTime.Today, <Employee.Id, DateTime.Now>>
         /// </summary>
-        private Dictionary<DateTime, Dictionary<int, DateTime>> timestamp4PunchOut = new Dictionary<DateTime, Dictionary<int, DateTime>>();
+        private Dictionary<DateTime, List<Dictionary<int, DateTime>>> timestamp4PunchOut = new Dictionary<DateTime, List<Dictionary<int, DateTime>>>();
         /// <summary>
         /// Represents the current operational mode of the system.
         /// </summary>
@@ -74,32 +75,47 @@ namespace OOProjectBasedLeaning
 
         public void PunchIn(int employeeId)
         {
+            DateTime today = DateTime.Today;
+
 
             if (IsAtWork(employeeId))
             {
 
                 // TODO
-                throw new InvalidOperationException("Employee is already at work.");
+                //throw new InvalidOperationException("Employee is already at work.");
 
             }
+            else
+            {
+                if (!timestamp4PunchIn.ContainsKey(today))
+                {
+                    timestamp4PunchIn.Add(today, new List<Dictionary<int, DateTime>>());
+                }
 
-            timestamp4PunchIn.Add(DateTime.Today, CreateTimestamp(employeeId));
-
+                timestamp4PunchIn[today].Add(CreateTimestamp(employeeId));
+            }
         }
 
         public void PunchOut(int employeeId)
         {
 
+            DateTime today = DateTime.Today;
+
             if (!IsAtWork(employeeId))
             {
 
                 // TODO
-                throw new InvalidOperationException("Employee is not at work.");
+                //throw new InvalidOperationException("Employee is not at work.");
 
             }
-
-            timestamp4PunchOut.Add(DateTime.Today, CreateTimestamp(employeeId));
-
+            else
+            {
+                if (!timestamp4PunchOut.ContainsKey(today))
+                {
+                    timestamp4PunchOut.Add(today, new List<Dictionary<int, DateTime>>());
+                }
+                timestamp4PunchOut[today].Add(CreateTimestamp(employeeId));
+            }
         }
 
         /// <summary>
@@ -120,9 +136,80 @@ namespace OOProjectBasedLeaning
         public bool IsAtWork(int employeeId)
         {
 
-            return timestamp4PunchIn[DateTime.Today].ContainsKey(employeeId)
-                && !timestamp4PunchOut[DateTime.Today].ContainsKey(employeeId);
+            if (timestamp4PunchInTodayDate(employeeId) == timestamp4PunchOutTodayDate(employeeId) + 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
+            //return timestamp4PunchInCheckData(employeeId)
+            //    && !timestamp4PunchOutCheckData(employeeId);
+        }
+
+        //public bool timestamp4PunchInCheckData(int employeeId)
+        //{
+        //    if (timestamp4PunchIn.ContainsKey(DateTime.Today))
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        //public bool timestamp4PunchOutCheckData(int employeeId)
+        //{
+        //    if (timestamp4PunchOut.ContainsKey(DateTime.Today))
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        public int timestamp4PunchInTodayDate(int employeeId)
+        {
+            int cnt = 0;
+            DateTime today = DateTime.Today;
+
+            if (timestamp4PunchIn.TryGetValue(today, out List<Dictionary<int, DateTime>> punchInData))
+            {
+                // 今日のデータが存在する場合、それを使用する
+                foreach (var entry in punchInData)
+                {
+                    if (entry.ContainsKey(employeeId))
+                    {
+                        cnt++;
+                    }
+                }
+            }
+
+            return cnt;
+        }
+        public int timestamp4PunchOutTodayDate(int employeeId)
+        {
+            int cnt = 0;
+            DateTime today = DateTime.Today;
+
+            if (timestamp4PunchOut.TryGetValue(today, out List<Dictionary<int, DateTime>> punchInData))
+            {
+                // 今日のデータが存在する場合、それを使用する
+                foreach (var entry in punchInData)
+                {
+                    if (entry.ContainsKey(employeeId))
+                    {
+                        cnt++;
+                    }
+                }
+            }
+
+            return cnt;
         }
 
     }
