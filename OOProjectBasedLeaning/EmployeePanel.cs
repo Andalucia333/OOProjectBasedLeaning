@@ -1,81 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
-namespace OOProjectBasedLeaning
-{
-    public class EmployeePanel : DragDropPanel
-    {
-        private Employee employee;
-        private TimeTracker timeTracker;
-        private Label statusLabel;
-        private TextBox nameTextBox;
-
-        public Employee Employee => employee;
-
-        public EmployeePanel(Employee employee, TimeTracker timeTracker)
-        {
-            this.employee = employee;
-            this.timeTracker = timeTracker;
-
-            InitializeComponent();
-        }
-
-        protected override void OnPanelMouseDown()
-        {
-            // DragDropPanelのDoDragDropMoveを呼び出してドラッグ開始
-            DoDragDropMove();
-        }
-
-        private void InitializeComponent()
-        {
-            this.BorderStyle = BorderStyle.FixedSingle;
-            this.BackColor = Color.LightYellow;
-            this.Size = new Size(300, 40);
-
-            Label nameLabel = new Label
-            {
-                Text = "名前:",
-                Location = new Point(10, 10),
-                AutoSize = true
-            };
-
-            nameTextBox = new TextBox
-            {
-                Text = employee.Name,
-                Location = new Point(60, 6),
-                Width = 120
-            };
-            nameTextBox.TextChanged += (s, e) => { employee.Name = nameTextBox.Text; };
-
-            statusLabel = new Label
-            {
-                Text = GetStatusText(),
-                Location = new Point(190, 10),
-                AutoSize = true,
-                ForeColor = Color.DarkBlue
-            };
-
-            Controls.Add(nameLabel);
-            Controls.Add(nameTextBox);
-            Controls.Add(statusLabel);
-        }
-
-        public void UpdateStatus()
-        {
-            statusLabel.Text = GetStatusText();
-        }
-
-        private string GetStatusText()
-        {
-            return timeTracker.IsAtWork(employee.Id) ? "勤務中" : "退勤中";
-        }
-    }
-}
-
-
-/*
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -86,10 +9,8 @@ namespace OOProjectBasedLeaning
 
     public class EmployeePanel : DragDropPanel
     {
-
-      
-
-        private Employee employee;
+        private Employee employee = NullEmployee.Instance;
+        private EmployeeNameTextBox employeeNameTextBox = NullEmployeeNameTextBox.Instance;
 
         public EmployeePanel(Employee employee)
         {
@@ -100,59 +21,111 @@ namespace OOProjectBasedLeaning
 
         }
 
+        private void InitializeComponent()
+        {
+
+            AutoSize = true;
+
+            EmployeeStatusLabel employeeStatusLabel = new EmployeeStatusLabel(employee)
+            {
+                Location = new Point(20, 10)
+            };
+
+            EmployeeNameLabel employeeNameLabel = new EmployeeNameLabel(employee)
+            {
+                Location = new Point(20, 30),
+                ForeColor = Color.Black,
+            };
+
+            employeeNameTextBox = new EmployeeNameTextBox(employee)
+            {
+                Location = new Point(140, 26),
+            };
+
+            Controls.Add(employeeStatusLabel);
+            Controls.Add(employeeNameLabel);
+            Controls.Add(employeeNameTextBox);
+
+        }
+
         protected override void OnPanelMouseDown()
         {
             DoDragDropMove();
 
-            if(GetFrom() is not EmployeeCreatorForm)
+            if (GetFrom() is not EmployeeCreatorForm)
             {
+                employeeNameTextBox.ReadOnly = true;
+                employeeNameTextBox.Hide();
 
-                
+                try
+                {
+                    if (GetFrom() is CompanyForm)
+                    {
+                        employee.GoToCompany();
+                    }
+                    else if (GetFrom() is HomeForm)
+                    {
+                        employee.GoToHome();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
             }
             else
             {
-
+                employeeNameTextBox.ReadOnly = false;
+                employeeNameTextBox.Show();
             }
         }
 
-
-        private void InitializeComponent()
+        public void AddCompany(Company company)
         {
+            employee.AddCompany(company);
+        }
 
-            Label employeeNameLabel = new Label
-            {
-                Text = employee.Name,
-                AutoSize = true,
-                Location = new Point(20, 10)
-            };
+        public void RemoveCompany()
+        {
+            employee.RemoveCompany();
+        }
 
-            TextBox guestNameTextBox = new TextBox
-            {
-                Text = employee.Name,
-                Location = new Point(140, 6),
-                Width = 160
-            };
+        public void AddHome(Home home)
+        {
+            employee.AddHome(home);
+        }
 
-            Controls.Add(employeeNameLabel);
-            Controls.Add(guestNameTextBox);
-
+        public void RemoveHome()
+        {
+            employee.RemoveHome();
         }
 
     }
 
+
+
+    //EmployeeStatusLabel
+    //勤務状態を表示
     public class EmployeeStatusLabel : Label, Observer
     {
         private Employee employee = NullEmployee.Instance;
 
-        public EmployeeStatusLabel()
+        public EmployeeStatusLabel(Employee employee)
         {
+            if (employee is NotifierModelEntity)
+            {
+                (employee as NotifierModelEntity).AddObserver(this);
+            }
+
+            this.employee = employee;
             InitializeComponent();
         }
 
         public void InitializeComponent()
         {
             this.AutoSize = true;
-            this.Font = new Font("Arial",10,FontStyle.Regular);
+            this.Font = new Font("Arial", 10, FontStyle.Regular);
 
             Update(this);
         }
@@ -164,9 +137,98 @@ namespace OOProjectBasedLeaning
                 Text = "勤務中";
                 ForeColor = Color.Red;
             }
-            //else if(employee.)
+            else if (employee.IsAtHome())
+            {
+                Text = "帰宅中";
+                ForeColor = Color.Green;
+            }
+            else
+            {
+                Text = "―――";
+                ForeColor = Color.Gray;
+            }
+        }
+    }
+
+
+
+    //EmployeeNameLabel 
+    //社員の名前を表示
+    public class EmployeeNameLabel : Label, Observer
+    {
+        private Employee employee = NullEmployee.Instance;
+
+        public EmployeeNameLabel(Employee employee)
+        {
+            if (employee is NotifierModelEntity)
+            {
+                (employee as NotifierModelEntity).AddObserver(this);
+            }
+
+            this.employee = employee;
+            InitializeComponent();
+
+        }
+
+        private void InitializeComponent()
+        {
+            this.AutoSize = true;
+            Update(this);
+        }
+
+        public void Update(object sender)
+        {
+            Text = employee.Name;
+        }
+    }
+
+
+
+    //EmployeeNameTextBox
+    //社員の名前を編集（EmployeeCreatorForm限定）
+    public class EmployeeNameTextBox : TextBox
+    {
+        private Employee employee = NullEmployee.Instance;
+        public EmployeeNameTextBox(Employee employee)
+        {
+            this.employee = employee;
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AutoSize = true;
+            Text = employee.Name;
+        }
+
+        public void Save()
+        {
+            employee.Name = Text;
+        }
+    }
+
+
+
+    //NullEmployeeNameTextBox 
+    //EmployeeNameTextBoxのNull
+    public class NullEmployeeNameTextBox : EmployeeNameTextBox
+    {
+        private static readonly EmployeeNameTextBox instance = new NullEmployeeNameTextBox();
+        private NullEmployeeNameTextBox() : base(NullEmployee.Instance)
+        {
+
+        }
+
+        public static EmployeeNameTextBox Instance
+        {
+            get { return instance; }
+        }
+
+        public override string Text
+        {
+            get { return string.Empty; }
+            set { }
         }
     }
 
 }
-*/

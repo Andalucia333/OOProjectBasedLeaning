@@ -8,7 +8,7 @@ using System.Xml.Linq;
 namespace OOProjectBasedLeaning
 {
 
-    public interface Company : Model
+    public interface Company : Model,Place
     {
 
         /// <summary>
@@ -89,9 +89,7 @@ namespace OOProjectBasedLeaning
 
             AcquireEmployees().ForEach(employee =>
             {
-
                 employee.AddCompany(this);
-
             });
 
         }
@@ -115,8 +113,10 @@ namespace OOProjectBasedLeaning
 
         public Company AddEmployee(Employee employee)
         {
-
-            employees.Add(employee.Id, employee);
+            if (!employees.ContainsKey(employee.Id))
+            { 
+                employees.Add(employee.Id, employee);
+            }
 
             return this;
 

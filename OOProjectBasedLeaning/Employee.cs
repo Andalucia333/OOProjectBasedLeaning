@@ -19,6 +19,9 @@ namespace OOProjectBasedLeaning
 
         Employee RemoveCompany();
 
+        Employee AddHome(Home home);
+        Employee RemoveHome();
+
         Company In();
 
         void ClockIn();
@@ -29,14 +32,20 @@ namespace OOProjectBasedLeaning
 
         bool IsAtHome();
 
+        void GoToCompany();
+
+        void GoToHome();
+
     }
 
-    public class EmployeeModel : ModelEntity, Employee
+    public class EmployeeModel : NotifierModelEntity, Employee
     {
 
         private int id;
-
+        
         private Company company = NullCompany.Instance;
+        private Place place = NullPlace.Instance;
+        private Home home = NullHome.Instance;
 
         public EmployeeModel() : this(Employee.NEW)
         {
@@ -104,6 +113,19 @@ namespace OOProjectBasedLeaning
 
         }
 
+        public Employee AddHome(Home home)
+        {
+            this.home = home.AddEmployee(this);
+            return this;
+        }
+
+        public Employee RemoveHome()
+        {
+            home.RemoveEmployee(this);
+            home = NullHome.Instance;
+            return this;
+        }
+
         public Company In()
         {
 
@@ -125,6 +147,21 @@ namespace OOProjectBasedLeaning
 
         }
 
+        public void GoToCompany()
+        {
+            place = company;
+            Notify();
+            
+        }
+
+        public void GoToHome()
+        {
+            place = home;
+            Notify();
+        }
+
+
+
         public bool IsAtWork()
         {
 
@@ -134,7 +171,7 @@ namespace OOProjectBasedLeaning
 
         public bool IsAtHome()
         {
-            return true;
+            return place is Home;
         }
 
     }
@@ -203,20 +240,20 @@ namespace OOProjectBasedLeaning
 
         }
 
+        public Employee AddHome(Home home)
+        {
+            return this;
+        }
+
+        public Employee RemoveHome()
+        {
+            return this;
+        }
+
         public Company In()
         {
 
             return NullCompany.Instance;
-
-        }
-
-        public void ClockIn()
-        {
-
-        }
-
-        public void ClockOut()
-        {
 
         }
 
@@ -231,6 +268,14 @@ namespace OOProjectBasedLeaning
         {
             return false;
         }
+
+        public void ClockIn() { }
+
+        public void ClockOut() { }
+
+        public void GoToCompany() { }
+        
+        public void GoToHome() { }
     }
 
 }
