@@ -48,11 +48,11 @@ namespace OOProjectBasedLeaning
         /// <summary>
         /// <DateTime.Today, <Employee.Id, DateTime.Now>>
         /// </summary>
-        private Dictionary<int, Dictionary<DateTime, DateTime>> timestamp4PunchIn = new Dictionary<int, Dictionary<DateTime, DateTime>>();
+        private Dictionary<DateTime, List<Dictionary<int, DateTime>>> timestamp4PunchIn = new Dictionary<DateTime, List<Dictionary<int, DateTime>>>();
         /// <summary>
         /// <DateTime.Today, <Employee.Id, DateTime.Now>>
         /// </summary>
-        private Dictionary<int, Dictionary<DateTime, DateTime>> timestamp4PunchOut = new Dictionary<int, Dictionary<DateTime, DateTime>>();
+        private Dictionary<DateTime, List<Dictionary<int, DateTime>>> timestamp4PunchOut = new Dictionary<DateTime, List<Dictionary<int, DateTime>>>();
         /// <summary>
         /// Represents the current operational mode of the system.
         /// </summary>
@@ -75,6 +75,8 @@ namespace OOProjectBasedLeaning
 
         public void PunchIn(int employeeId)
         {
+            DateTime today = DateTime.Today;
+
 
             if (IsAtWork(employeeId))
             {
@@ -85,12 +87,19 @@ namespace OOProjectBasedLeaning
             }
             else
             {
-                timestamp4PunchIn.Add(employeeId, CreateTimestamp(DateTime.Today));
+                if (!timestamp4PunchIn.ContainsKey(today))
+                {
+                    timestamp4PunchIn.Add(today, new List<Dictionary<int, DateTime>>());
+                }
+
+                timestamp4PunchIn[today].Add(CreateTimestamp(employeeId));
             }
         }
 
         public void PunchOut(int employeeId)
         {
+
+            DateTime today = DateTime.Today;
 
             if (!IsAtWork(employeeId))
             {
@@ -101,7 +110,11 @@ namespace OOProjectBasedLeaning
             }
             else
             {
-                timestamp4PunchOut.Add(employeeId, CreateTimestamp(DateTime.Today));
+                if (!timestamp4PunchOut.ContainsKey(today))
+                {
+                    timestamp4PunchOut.Add(today, new List<Dictionary<int, DateTime>>());
+                }
+                timestamp4PunchOut[today].Add(CreateTimestamp(employeeId));
             }
         }
 
@@ -110,11 +123,11 @@ namespace OOProjectBasedLeaning
         /// </summary>
         /// <param name="employeeId">従業員のID</param>
         /// <returns>生成された Dictionary<int, DateTime> のオブジェクト</returns>
-        private Dictionary<DateTime, DateTime> CreateTimestamp(DateTime today)
+        private Dictionary<int, DateTime> CreateTimestamp(int employeeId)
         {
 
-            Dictionary<DateTime, DateTime> timestamp = new Dictionary<DateTime, DateTime>();
-            timestamp.Add(today, DateTime.Now);
+            Dictionary<int, DateTime> timestamp = new Dictionary<int, DateTime>();
+            timestamp.Add(employeeId, DateTime.Now);
 
             return timestamp;
 
@@ -165,12 +178,12 @@ namespace OOProjectBasedLeaning
             int cnt = 0;
             DateTime today = DateTime.Today;
 
-            if (timestamp4PunchIn.TryGetValue(employeeId, out Dictionary<DateTime, DateTime> punchInData))
+            if (timestamp4PunchIn.TryGetValue(today, out List<Dictionary<int, DateTime>> punchInData))
             {
                 // 今日のデータが存在する場合、それを使用する
                 foreach (var entry in punchInData)
                 {
-                    if (timestamp4PunchIn[employeeId].ContainsKey(today))
+                    if (entry.ContainsKey(employeeId))
                     {
                         cnt++;
                     }
@@ -184,12 +197,12 @@ namespace OOProjectBasedLeaning
             int cnt = 0;
             DateTime today = DateTime.Today;
 
-            if (timestamp4PunchOut.TryGetValue(employeeId, out Dictionary<DateTime, DateTime> punchInData))
+            if (timestamp4PunchOut.TryGetValue(today, out List<Dictionary<int, DateTime>> punchInData))
             {
                 // 今日のデータが存在する場合、それを使用する
                 foreach (var entry in punchInData)
                 {
-                    if (timestamp4PunchOut[employeeId].ContainsKey(today))
+                    if (entry.ContainsKey(employeeId))
                     {
                         cnt++;
                     }
